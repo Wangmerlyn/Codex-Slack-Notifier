@@ -221,17 +221,15 @@ def main(argv: Optional[list[str]] = None) -> int:
     logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
     args = _parse_args(argv)
 
-    if args.env_file:
+    env_file_to_load = args.env_file
+    if not env_file_to_load and Path(".env").exists():
+        env_file_to_load = ".env"
+
+    if env_file_to_load:
         try:
-            _load_env_file(args.env_file)
+            _load_env_file(env_file_to_load)
         except SlackNotificationError as exc:
-            LOG.error("Failed to load env file: %s", exc)
-            return 1
-    elif Path(".env").exists():
-        try:
-            _load_env_file(".env")
-        except SlackNotificationError as exc:
-            LOG.error("Failed to load .env: %s", exc)
+            LOG.error("Failed to load env file %s: %s", env_file_to_load, exc)
             return 1
 
     token = os.environ.get(args.token_env)
