@@ -4,6 +4,11 @@ Send Codex task completion alerts straight to your Slack DMs using the Slack Web
 
 For a detailed, step-by-step guide (setup, config, debugging, FAQs), see `docs/guide.md`.
 
+## Why This Slack Notifier
+- Codex has a notify hook but the VS Code extension still lacks built-in completion alerts (sound/visual); community requests for audible notifications haven’t shipped, so you must watch the editor.
+- CLI-based tricks (terminal bells, desktop notifications) often fail over Remote-SSH because the sound/notification doesn’t propagate, leaving remote users uninformed.
+- This project fills the gap with Slack DMs: reliable, cross-platform, and independent of where Codex runs, so you get task-completion messages without keeping VS Code in focus or on your local machine.
+
 ## Quick start
 1. **Clone & env**
    - `git clone git@github.com:Wangmerlyn/Codex-Slack-Notifier.git`
