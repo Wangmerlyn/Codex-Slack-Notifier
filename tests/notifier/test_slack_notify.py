@@ -121,6 +121,7 @@ def test_retry_after_parses_float_and_clamps(monkeypatch: pytest.MonkeyPatch) ->
     assert sleep_calls == [2]
     assert len(session.posts) == 3
 
+
 def test_load_payload_supports_file(tmp_path: Path) -> None:
     payload_path = tmp_path / "payload.json"
     payload_data = {"status": "done"}
