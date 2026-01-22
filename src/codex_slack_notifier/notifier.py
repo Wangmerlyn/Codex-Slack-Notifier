@@ -1,5 +1,6 @@
 import argparse
 import json
+import math
 import logging
 import os
 import sys
@@ -53,7 +54,14 @@ class SlackNotifier:
                 raise SlackNotificationError(f"Request to Slack failed: {exc}") from exc
 
             if response.status_code == 429 and attempts < max_attempts:
-                retry_after = int(response.headers.get("Retry-After", "1"))
+                retry_header = response.headers.get("Retry-After")
+                retry_after = 1
+                if retry_header:
+                    try:
+                        retry_val = float(retry_header)
+                        retry_after = max(1, int(math.ceil(retry_val)))
+                    except (ValueError, TypeError):
+                        retry_after = 1
                 LOG.warning(
                     "Slack rate limited request to %s, retrying in %s seconds",
                     endpoint,

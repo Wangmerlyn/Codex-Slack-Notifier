@@ -101,6 +101,26 @@ def test_send_dm_retries_on_rate_limit(monkeypatch: pytest.MonkeyPatch) -> None:
     assert session.posts[2]["url"].endswith("chat.postMessage")
 
 
+def test_retry_after_parses_float_and_clamps(monkeypatch: pytest.MonkeyPatch) -> None:
+    sleep_calls: list[int] = []
+    responses = [
+        FakeResponse(
+            status_code=429,
+            json_data={"ok": False, "error": "ratelimited"},
+            headers={"Retry-After": "1.6"},
+        ),
+        FakeResponse(json_data={"ok": True, "channel": {"id": "C123"}}),
+        FakeResponse(json_data={"ok": True, "ts": "1.2"}),
+    ]
+    session = FakeSession(responses)
+    notifier = SlackNotifier("xoxb-test-token", session=session)
+    monkeypatch.setattr("time.sleep", lambda seconds: sleep_calls.append(seconds))
+
+    notifier.send_dm("U999", "rate limited message")
+
+    assert sleep_calls == [2]
+    assert len(session.posts) == 3
+
 def test_load_payload_supports_file(tmp_path: Path) -> None:
     payload_path = tmp_path / "payload.json"
     payload_data = {"status": "done"}
