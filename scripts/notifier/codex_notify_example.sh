@@ -2,9 +2,10 @@
 # Example: configure Codex to call the Slack notifier after tasks complete.
 #
 # Optional: load env vars if present
-if [ -f "/home/you/Codex-Slack-Notifier/.env" ]; then
+SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &> /dev/null && pwd)
+if [ -f "$SCRIPT_DIR/../../.env" ]; then
   set -a
-  . /home/you/Codex-Slack-Notifier/.env
+  . "$SCRIPT_DIR/../../.env"
   set +a
 fi
 
