@@ -1,4 +1,5 @@
 import json
+import os
 from pathlib import Path
 from typing import Any, Dict, List
 
@@ -144,3 +145,17 @@ def test_build_message_with_empty_payload_returns_default() -> None:
     """Ensure build_message returns the default message for an empty payload."""
     message = build_message({})
     assert message == "Codex task completed."
+
+
+def test_env_file_loader_sets_vars(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    env_file = tmp_path / ".env"
+    env_file.write_text("export SLACK_BOT_TOKEN=test-token\nSLACK_USER_ID=U1\n", encoding="utf-8")
+    monkeypatch.delenv("SLACK_BOT_TOKEN", raising=False)
+    monkeypatch.delenv("SLACK_USER_ID", raising=False)
+
+    from codex_slack_notifier import notifier
+
+    notifier._load_env_file(str(env_file))
+
+    assert os.environ["SLACK_BOT_TOKEN"] == "test-token"
+    assert os.environ["SLACK_USER_ID"] == "U1"

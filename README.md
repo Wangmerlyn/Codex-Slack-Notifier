@@ -19,9 +19,16 @@ Send Codex task completion alerts straight to your Slack DMs using the Slack Web
 
 3. **Set environment variables**
    ```bash
+   # Option A: export directly
    export SLACK_BOT_TOKEN=xoxb-your-token-here
    export SLACK_USER_ID=U12345678   # or pass --user-id
+
+   # Option B: copy and edit .env.example, then
+   cp .env.example .env
+   # edit .env, then load it
+   set -a; source .env; set +a
    ```
+   Tokens are read from the environment only. The notifier also auto-loads `.env` (or a file passed via `--env-file`) if present.
 
 4. **Send a manual test DM**
    ```bash

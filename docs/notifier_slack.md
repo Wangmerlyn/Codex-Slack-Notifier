@@ -10,10 +10,15 @@ Send Codex completion events as Slack direct messages using the Slack Web API (n
 
 ## Environment variables
 ```
+# Option A: export directly
 export SLACK_BOT_TOKEN=xoxb-123...             # required
 export SLACK_USER_ID=U12345678                 # optional if passed via --user-id
+
+# Option B: use a .env file (see .env.example)
+cp .env.example .env
+set -a; source .env; set +a
 ```
-Tokens are read from the environment only; nothing is hard-coded.
+Tokens are read from the environment only; nothing is hard-coded. The notifier also auto-loads `.env` (or a file passed via `--env-file`) if present.
 
 ## Script usage
 The notifier lives at `scripts/notifier/slack_notify.py` and accepts JSON payloads on stdin or via flags.

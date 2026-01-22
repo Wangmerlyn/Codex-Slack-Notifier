@@ -1,11 +1,18 @@
 #!/usr/bin/env bash
 # Example: configure Codex to call the Slack notifier after tasks complete.
 #
+# Optional: load env vars if present
+if [ -f "/home/you/Codex-Slack-Notifier/.env" ]; then
+  set -a
+  . /home/you/Codex-Slack-Notifier/.env
+  set +a
+fi
+
 # Replace U12345678 with your Slack User ID and adjust the path to this repository.
 # Then register the command with Codex:
-#   codex config set notify "/home/you/Codex-Slack-Notifier/scripts/notifier/slack_notify.py --user-id U12345678"
+#   codex config set notify "/home/you/Codex-Slack-Notifier/scripts/notifier/slack_notify.py --user-id ${SLACK_USER_ID:-U12345678}"
 
-python /home/you/Codex-Slack-Notifier/scripts/notifier/slack_notify.py --user-id U12345678 <<'JSON'
+python /home/you/Codex-Slack-Notifier/scripts/notifier/slack_notify.py --user-id "${SLACK_USER_ID:-U12345678}" <<'JSON'
 {
   "status": "success",
   "title": "Sample Codex run",
