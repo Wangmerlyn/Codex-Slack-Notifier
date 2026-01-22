@@ -117,3 +117,9 @@ def test_load_payload_rejects_invalid_json(tmp_path: Path) -> None:
 
     with pytest.raises(SlackNotificationError):
         load_payload(None, str(payload_path))
+
+
+def test_build_message_with_empty_payload_returns_default() -> None:
+    """Ensure build_message returns the default message for an empty payload."""
+    message = build_message({})
+    assert message == "Codex task completed."
