@@ -5,6 +5,7 @@ import logging
 import os
 import sys
 import time
+from pathlib import Path
 from typing import Any, Dict, Optional
 
 import requests
@@ -173,6 +174,10 @@ def _parse_args(argv: Optional[list[str]] = None) -> argparse.Namespace:
         default=os.environ.get("SLACK_USER_ID"),
     )
     parser.add_argument(
+        "--env-file",
+        help="Path to a .env file with SLACK_BOT_TOKEN/SLACK_USER_ID values",
+    )
+    parser.add_argument(
         "--token-env",
         help="Environment variable that holds the Slack Bot Token",
         default="SLACK_BOT_TOKEN",
@@ -192,9 +197,40 @@ def _parse_args(argv: Optional[list[str]] = None) -> argparse.Namespace:
     return parser.parse_args(argv)
 
 
+def _load_env_file(env_file: str) -> None:
+    """Load simple KEY=VALUE pairs (optionally prefixed with 'export ') into os.environ."""
+    env_path = Path(env_file)
+    if not env_path.exists():
+        raise SlackNotificationError(f".env file not found: {env_file}")
+
+    for line in env_path.read_text(encoding="utf-8").splitlines():
+        stripped = line.strip()
+        if not stripped or stripped.startswith("#"):
+            continue
+        if stripped.lower().startswith("export "):
+            stripped = stripped[len("export ") :].strip()
+        if "=" not in stripped:
+            continue
+        key, value = stripped.split("=", 1)
+        key, value = key.strip(), value.strip()
+        if key and value and key not in os.environ:
+            os.environ[key] = value
+
+
 def main(argv: Optional[list[str]] = None) -> int:
     logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
     args = _parse_args(argv)
+
+    env_file_to_load = args.env_file
+    if not env_file_to_load and Path(".env").exists():
+        env_file_to_load = ".env"
+
+    if env_file_to_load:
+        try:
+            _load_env_file(env_file_to_load)
+        except SlackNotificationError as exc:
+            LOG.error("Failed to load env file %s: %s", env_file_to_load, exc)
+            return 1
 
     token = os.environ.get(args.token_env)
     if not token:
