@@ -3,6 +3,8 @@ set -euo pipefail
 
 # Accept payload either via a file path argument ($1) or stdin.
 src="${1:-/dev/stdin}"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ENV_FILE="${ENV_FILE:-"$SCRIPT_DIR/../../.env"}"
 
 # If DEBUG_CODEX_PAYLOAD is set to a filepath, the selected payload will be written there.
 filter_and_forward() {
@@ -47,4 +49,7 @@ sys.stdout.write(out)
 PY
 }
 
-filter_and_forward | python3 /home/wsy0227/Codex-Slack-Notifier/scripts/notifier/slack_notify.py --env-file /home/wsy0227/Codex-Slack-Notifier/.env
+if ! filter_and_forward | python3 "$SCRIPT_DIR/slack_notify.py" --env-file "$ENV_FILE"; then
+  echo "Notifier failed to send message" >&2
+  exit 1
+fi

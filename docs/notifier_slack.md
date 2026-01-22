@@ -44,11 +44,11 @@ A concrete example is in `scripts/notifier/codex_notify_example.sh`.
 ### Optional debugging
 - If Codex supplies a payload file instead of stdin, use the wrapper:
   ```
-  notify = ["/home/wsy0227/Codex-Slack-Notifier/scripts/notifier/codex_notify_wrapper.sh"]
+  notify = ["/path/to/Codex-Slack-Notifier/scripts/notifier/codex_notify_wrapper.sh"]
   ```
 - To capture the selected payload for inspection, set:
   ```
-  export DEBUG_CODEX_PAYLOAD=/home/wsy0227/codex_payload.json
+  export DEBUG_CODEX_PAYLOAD=/path/to/your/codex_payload.json
   ```
   Unset this variable to stop logging.
 
