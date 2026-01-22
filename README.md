@@ -3,7 +3,7 @@
 Send Codex task completion alerts straight to your Slack DMs using the Slack Web API (no webhooks).
 
 [![CodeRabbit Reviews](https://img.shields.io/coderabbit/prs/github/Wangmerlyn/Codex-Slack-Notifier?utm_source=oss&utm_medium=github&utm_campaign=Wangmerlyn%2FCodex-Slack-Notifier&labelColor=171717&color=FF570A&link=https%3A%2F%2Fcoderabbit.ai&label=CodeRabbit+Reviews)](https://coderabbit.ai)
-[![DeepWiki](https://img.shields.io/badge/DeepWiki-Docs-0A81FF)](https://deepwiki.ai)
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/Wangmerlyn/Codex-Slack-Notifier)
 
 For a detailed, step-by-step guide (setup, config, debugging, FAQs), see `docs/guide.md`.
 
