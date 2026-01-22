@@ -1,7 +1,7 @@
 # Repository Guidelines
 
 ## Project Purpose & Layout
-- Goal: A convenient entry point for coding agent to send the user the message of task completion through slack.
+- Goal: A convenient entry point for a coding agent to send the user a message about task completion via Slack.
 
 ## Repository Structure (Modify this part when you have learned enough about this repository)
 - `scripts/notifier/`: Slack notifier CLI and example Codex notify script.
