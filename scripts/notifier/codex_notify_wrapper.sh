@@ -3,11 +3,17 @@ set -euo pipefail
 
 # Accept payload either via a file path argument ($1) or stdin.
 if [[ -n "${1:-}" && "${1}" != "/dev/stdin" && "${1}" != "-" ]]; then
-  if [[ ! -r "${1}" ]]; then
-    echo "Payload file '${1}' not found or not readable" >&2
-    exit 1
+  candidate="${1}"
+  if [[ ! -r "${candidate}" ]]; then
+    # brief retry in case the file is being written
+    sleep 0.2
   fi
-  src="${1}"
+  if [[ -r "${candidate}" ]]; then
+    src="${candidate}"
+  else
+    echo "Payload file '${candidate}' not found or not readable, falling back to stdin" >&2
+    src="/dev/stdin"
+  fi
 else
   src="/dev/stdin"
 fi
