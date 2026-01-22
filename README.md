@@ -2,6 +2,8 @@
 
 Send Codex task completion alerts straight to your Slack DMs using the Slack Web API (no webhooks).
 
+For a detailed, step-by-step guide (setup, config, debugging, FAQs), see `docs/guide.md`.
+
 ## Quick start
 1. **Clone & env**
    - `git clone git@github.com:Wangmerlyn/Codex-Slack-Notifier.git`
