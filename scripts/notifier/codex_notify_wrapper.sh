@@ -42,7 +42,10 @@ for line in read_lines():
 chosen = last_relevant or last_valid or {}
 out = json.dumps(chosen)
 if debug_path:
-    pathlib.Path(debug_path).write_text(out + "\n", encoding="utf-8")
+    try:
+        pathlib.Path(debug_path).write_text(out + "\n", encoding="utf-8")
+    except OSError as exc:
+        print(f"DEBUG_CODEX_PAYLOAD write failed: {exc}", file=sys.stderr)
 sys.stdout.write(out)
 PY
 }
