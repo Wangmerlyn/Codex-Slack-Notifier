@@ -30,7 +30,7 @@ for line in read_lines():
         continue
     try:
         obj = json.loads(clean)
-    except Exception:
+    except json.JSONDecodeError:
         continue
     last_valid = obj
     if isinstance(obj, dict) and is_relevant(obj):
