@@ -232,12 +232,14 @@ def main(argv: Optional[list[str]] = None) -> int:
             LOG.error("Failed to load env file %s: %s", env_file_to_load, exc)
             return 1
 
+    user_id = args.user_id or os.environ.get("SLACK_USER_ID")
+
     token = os.environ.get(args.token_env)
     if not token:
         LOG.error("Missing Slack token in environment variable %s", args.token_env)
         return 1
 
-    if not args.user_id:
+    if not user_id:
         LOG.error("Missing Slack user ID (set --user-id or SLACK_USER_ID)")
         return 1
 
@@ -245,12 +247,12 @@ def main(argv: Optional[list[str]] = None) -> int:
         payload = load_payload(args.payload, args.payload_file)
         message = build_message(payload, args.title)
         notifier = SlackNotifier(token)
-        notifier.send_dm(args.user_id, message)
+        notifier.send_dm(user_id, message)
     except SlackNotificationError as exc:
         LOG.error("Failed to send Slack notification: %s", exc)
         return 1
 
-    LOG.info("Slack notification sent to %s", args.user_id)
+    LOG.info("Slack notification sent to %s", user_id)
     return 0
 
 
