@@ -56,3 +56,14 @@ Send Codex task completion alerts straight to your Slack DMs using the Slack Web
 ## More details
 - `docs/notifier_slack.md` contains expanded setup notes and troubleshooting.
 - Example Codex wiring: `scripts/notifier/codex_notify_example.sh`.
+
+### Debugging Codex notify (optional)
+- Use the wrapper that can read payloads from a file argument (as Codex may supply) or stdin:
+  ```
+  notify = ["/path/to/Codex-Slack-Notifier/scripts/notifier/codex_notify_wrapper.sh"]
+  ```
+- To capture the final payload for debugging, set an env var before running Codex:
+  ```
+  export DEBUG_CODEX_PAYLOAD=/path/to/your/codex_payload.json
+  ```
+  The wrapper will write only the most relevant JSON payload to that path; unset the variable to stop logging.
