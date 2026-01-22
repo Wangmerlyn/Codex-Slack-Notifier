@@ -4,7 +4,7 @@ Send Codex completion events as Slack direct messages using the Slack Web API (n
 
 ## Slack app setup
 - Create a Slack app (from a manifest or https://api.slack.com/apps). Choose a Bot token.
-- Add bot scopes: `chat:write`, `im:write` (or `conversations:write`), and `users:read` if you need to look up IDs.
+- Add bot scopes: `chat:write`, `im:write`, and `users:read` if you need to look up IDs.
 - Install the app to your workspace and grab the **Bot User OAuth Token** (starts with `xoxb-`).
 - Find your Slack User ID (profile → ⋯ → Copy member ID) for the DM recipient.
 
