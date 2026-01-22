@@ -13,7 +13,7 @@ Send Codex task completion alerts straight to your Slack DMs using the Slack Web
 2. **Create a Slack app**
    - Go to https://api.slack.com/apps → “Create New App” → “From scratch”.
    - Choose a workspace and create a Bot token.
-   - Add Bot scopes: `chat:write`, `im:write` (or `conversations:write`), and `users:read` if you need lookups.
+   - Add Bot scopes: `chat:write`, `im:write`, and `users:read` if you need lookups.
    - Install the app to the workspace and copy the **Bot User OAuth Token** (`xoxb-...`).
    - Find your Slack User ID (Profile → ⋯ → Copy member ID).
 
