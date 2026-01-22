@@ -1,0 +1,145 @@
+import json
+from pathlib import Path
+from typing import Any, Dict, List
+
+import pytest
+
+from codex_slack_notifier.notifier import (
+    SlackNotificationError,
+    SlackNotifier,
+    build_message,
+    load_payload,
+)
+
+
+class FakeResponse:
+    def __init__(
+        self,
+        status_code: int = 200,
+        json_data: Dict[str, Any] | None = None,
+        headers: Dict[str, str] | None = None,
+    ) -> None:
+        self.status_code = status_code
+        self._json = json_data or {}
+        self.headers = headers or {}
+
+    def json(self) -> Dict[str, Any]:
+        return self._json
+
+    def raise_for_status(self) -> None:
+        if self.status_code >= 400:
+            raise Exception(f"HTTP {self.status_code}")
+
+
+class FakeSession:
+    def __init__(self, responses: List[FakeResponse]) -> None:
+        self.responses = responses
+        self.posts: list[dict[str, Any]] = []
+
+    def post(
+        self,
+        url: str,
+        headers: dict[str, Any],
+        json: dict[str, Any],
+        timeout: int,
+    ) -> FakeResponse:
+        self.posts.append({"url": url, "headers": headers, "json": json, "timeout": timeout})
+        return self.responses.pop(0)
+
+
+def test_build_message_prefers_payload_fields() -> None:
+    payload = {
+        "title": "Run notebook",
+        "status": "success",
+        "duration": "3m 12s",
+        "summary": "Notebook finished with no errors",
+        "url": "https://example.com/logs/123",
+    }
+    message = build_message(payload)
+    assert "Run notebook" in message
+    assert "Status: success" in message
+    assert "3m 12s" in message
+    assert "Notebook finished with no errors" in message
+    assert "https://example.com/logs/123" in message
+
+
+def test_send_dm_sends_open_then_message(monkeypatch: pytest.MonkeyPatch) -> None:
+    responses = [
+        FakeResponse(json_data={"ok": True, "channel": {"id": "C123"}}),
+        FakeResponse(json_data={"ok": True, "ts": "1.2"}),
+    ]
+    session = FakeSession(responses)
+    notifier = SlackNotifier("xoxb-test-token", session=session)
+    monkeypatch.setattr("time.sleep", lambda _: None)
+
+    notifier.send_dm("U999", "hello world")
+
+    assert len(session.posts) == 2
+    assert session.posts[0]["json"]["users"] == "U999"
+    assert session.posts[1]["json"]["text"] == "hello world"
+
+
+def test_send_dm_retries_on_rate_limit(monkeypatch: pytest.MonkeyPatch) -> None:
+    responses = [
+        FakeResponse(
+            status_code=429,
+            json_data={"ok": False, "error": "ratelimited"},
+            headers={"Retry-After": "0"},
+        ),
+        FakeResponse(json_data={"ok": True, "channel": {"id": "C123"}}),
+        FakeResponse(json_data={"ok": True, "ts": "1.2"}),
+    ]
+    session = FakeSession(responses)
+    notifier = SlackNotifier("xoxb-test-token", session=session)
+    monkeypatch.setattr("time.sleep", lambda _: None)
+
+    notifier.send_dm("U999", "rate limited message")
+
+    assert len(session.posts) == 3
+    assert session.posts[0]["url"].endswith("conversations.open")
+    assert session.posts[1]["url"].endswith("conversations.open")
+    assert session.posts[2]["url"].endswith("chat.postMessage")
+
+
+def test_retry_after_parses_float_and_clamps(monkeypatch: pytest.MonkeyPatch) -> None:
+    sleep_calls: list[int] = []
+    responses = [
+        FakeResponse(
+            status_code=429,
+            json_data={"ok": False, "error": "ratelimited"},
+            headers={"Retry-After": "1.6"},
+        ),
+        FakeResponse(json_data={"ok": True, "channel": {"id": "C123"}}),
+        FakeResponse(json_data={"ok": True, "ts": "1.2"}),
+    ]
+    session = FakeSession(responses)
+    notifier = SlackNotifier("xoxb-test-token", session=session)
+    monkeypatch.setattr("time.sleep", lambda seconds: sleep_calls.append(seconds))
+
+    notifier.send_dm("U999", "rate limited message")
+
+    assert sleep_calls == [2]
+    assert len(session.posts) == 3
+
+def test_load_payload_supports_file(tmp_path: Path) -> None:
+    payload_path = tmp_path / "payload.json"
+    payload_data = {"status": "done"}
+    payload_path.write_text(json.dumps(payload_data), encoding="utf-8")
+
+    loaded = load_payload(None, str(payload_path))
+
+    assert loaded == payload_data
+
+
+def test_load_payload_rejects_invalid_json(tmp_path: Path) -> None:
+    payload_path = tmp_path / "bad.json"
+    payload_path.write_text("not-json", encoding="utf-8")
+
+    with pytest.raises(SlackNotificationError):
+        load_payload(None, str(payload_path))
+
+
+def test_build_message_with_empty_payload_returns_default() -> None:
+    """Ensure build_message returns the default message for an empty payload."""
+    message = build_message({})
+    assert message == "Codex task completed."
