@@ -2,7 +2,15 @@
 set -euo pipefail
 
 # Accept payload either via a file path argument ($1) or stdin.
-src="${1:-/dev/stdin}"
+if [[ -n "${1:-}" && "${1}" != "/dev/stdin" && "${1}" != "-" ]]; then
+  if [[ ! -r "${1}" ]]; then
+    echo "Payload file '${1}' not found or not readable" >&2
+    exit 1
+  fi
+  src="${1}"
+else
+  src="/dev/stdin"
+fi
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 ENV_FILE="${ENV_FILE:-"$REPO_ROOT/.env"}"
