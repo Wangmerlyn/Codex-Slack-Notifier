@@ -4,7 +4,8 @@ set -euo pipefail
 # Accept payload either via a file path argument ($1) or stdin.
 src="${1:-/dev/stdin}"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-ENV_FILE="${ENV_FILE:-"$SCRIPT_DIR/../../.env"}"
+REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
+ENV_FILE="${ENV_FILE:-"$REPO_ROOT/.env"}"
 
 # If DEBUG_CODEX_PAYLOAD is set to a filepath, the selected payload will be written there.
 filter_and_forward() {
@@ -38,10 +39,7 @@ for line in read_lines():
     if isinstance(obj, dict) and is_relevant(obj):
         last_relevant = obj
 
-chosen = last_relevant or last_valid
-if chosen is None:
-    sys.exit(0)
-
+chosen = last_relevant or last_valid or {}
 out = json.dumps(chosen)
 if debug_path:
     pathlib.Path(debug_path).write_text(out + "\n", encoding="utf-8")

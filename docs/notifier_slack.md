@@ -52,6 +52,8 @@ A concrete example is in `scripts/notifier/codex_notify_example.sh`.
   ```
   Unset this variable to stop logging.
 
+> The wrapper defaults to loading `.env` from the repo root; override with `ENV_FILE=/custom/path/.env` if you store credentials elsewhere.
+
 ## Installing & testing
 ```
 conda activate codex_slack_notifier
