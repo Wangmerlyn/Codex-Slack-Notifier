@@ -41,6 +41,17 @@ codex config set notify "/abs/path/to/scripts/notifier/slack_notify.py --user-id
 Codex will pipe a JSON payload to the script; the notifier formats a concise DM (title, status, duration, summary, link when present).
 A concrete example is in `scripts/notifier/codex_notify_example.sh`.
 
+### Optional debugging
+- If Codex supplies a payload file instead of stdin, use the wrapper:
+  ```
+  notify = ["/home/wsy0227/Codex-Slack-Notifier/scripts/notifier/codex_notify_wrapper.sh"]
+  ```
+- To capture the selected payload for inspection, set:
+  ```
+  export DEBUG_CODEX_PAYLOAD=/home/wsy0227/codex_payload.json
+  ```
+  Unset this variable to stop logging.
+
 ## Installing & testing
 ```
 conda activate codex_slack_notifier
