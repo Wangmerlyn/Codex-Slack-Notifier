@@ -1,0 +1,10 @@
+{
+  "hooks": {
+    "Stop": [
+      {
+        "type": "command",
+        "command": "/path/to/Codex-Slack-Notifier/scripts/notifier/codex_notify_wrapper.sh"
+      }
+    ]
+  }
+}
