@@ -31,6 +31,7 @@ Many coding-agent CLIs expose hooks or plugin points that can run shell commands
     }
   }
   ```
+  See `docs/examples/claude/settings.json`.
 
 ## Gemini CLI
 - Similar hook support; configure in `.gemini/settings.json`.
@@ -46,6 +47,7 @@ Many coding-agent CLIs expose hooks or plugin points that can run shell commands
     }
   }
   ```
+  See `docs/examples/gemini/hooks.json`.
 
 ## OpenCode
 - Use its plugin/hook extensibility to invoke the notifier on relevant events (e.g., session complete).
@@ -61,6 +63,7 @@ Many coding-agent CLIs expose hooks or plugin points that can run shell commands
     },
   });
   ```
+  See `docs/examples/opencode/slackNotifier.js`.
 
 ## Copilot CLI & Cursor
 - No native hooks today. Workaround: wrap the CLI call and invoke the notifier afterward:
@@ -68,6 +71,7 @@ Many coding-agent CLIs expose hooks or plugin points that can run shell commands
   copilot "$@"
   /path/to/Codex-Slack-Notifier/scripts/notifier/codex_notify_wrapper.sh
   ```
+  See `docs/examples/copilot_wrapper.sh` for a minimal wrapper.
 
 ## Tips
 - Keep the notify command short and use absolute paths.
