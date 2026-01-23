@@ -127,6 +127,11 @@ def build_message(payload: Dict[str, Any], default_title: Optional[str] = None) 
     repo = payload.get("repo") or payload.get("cwd") or payload.get("workspace")
 
     lines = []
+
+    # If we only have repo, return a single-line, humane message.
+    if repo and not any([title, status, duration, summary, url]):
+        return f"Codex task completed at repo {repo}"
+
     if title:
         lines.append(str(title))
     if status:
@@ -142,9 +147,6 @@ def build_message(payload: Dict[str, Any], default_title: Optional[str] = None) 
 
     if not lines:
         return "Codex task completed."
-    if lines == [f"Repo: {repo}"]:
-        # Provide a humane default headline when only repo is present.
-        lines.insert(0, "Codex task completed.")
 
     return "\n".join(lines)
 
