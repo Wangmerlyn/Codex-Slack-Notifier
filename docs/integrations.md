@@ -47,7 +47,7 @@ Many coding-agent CLIs expose hooks or plugin points that can run shell commands
     }
   }
   ```
-  See `docs/examples/gemini/hooks.json`.
+  See `docs/examples/gemini/hooks.json` for a copy/paste starter that matches `.gemini/settings.json`.
 
 ## OpenCode
 - Use its plugin/hook extensibility to invoke the notifier on relevant events (e.g., session complete).
