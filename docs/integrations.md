@@ -84,5 +84,5 @@ Many coding-agent CLIs expose hooks or plugin points that can run shell commands
 
 ## Tips
 - Keep the notify command short and use absolute paths.
-- If the tool supplies a payload file path as `$1`, the wrapper will read it; if not, it reads stdin or inline JSON.
+- The wrapper reads the payload from a file path passed as `$1`. If `$1` is an inline JSON string, it's also handled. If no argument is given, it reads from stdin.
 - Set `LOGLEVEL=WARNING` (or use `--log-level WARNING`) when calling `slack_notify.py` directly to avoid chatty stdout/stderr in host tools.
