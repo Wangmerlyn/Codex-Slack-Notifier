@@ -18,7 +18,7 @@ if [[ -n "${1:-}" && "${1}" != "/dev/stdin" && "${1}" != "-" ]]; then
       # brief retry in case the file is being written
       sleep 0.2
     fi
-    if [[ -r "${candidate}" ]]; then
+    if [[ -f "${candidate}" && -r "${candidate}" ]]; then
       src="${candidate}"
     else
       echo "Payload file '${candidate}' not found or not readable, falling back to stdin" >&2
