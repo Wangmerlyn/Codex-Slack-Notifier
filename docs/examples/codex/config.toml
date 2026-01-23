@@ -1,0 +1,7 @@
+model = "gpt-5.1-codex-max"
+model_reasoning_effort = "high"
+notify = ["/path/to/Codex-Slack-Notifier/scripts/notifier/codex_notify_wrapper.sh"]
+
+# Optional:
+# DEBUG_CODEX_PAYLOAD=/tmp/codex_payload.json
+# ENV_FILE=/path/to/.env

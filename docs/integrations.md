@@ -73,6 +73,15 @@ Many coding-agent CLIs expose hooks or plugin points that can run shell commands
   ```
   See `docs/examples/copilot_wrapper.sh` for a minimal wrapper.
 
+## Codex CLI (reference)
+- Example `~/.codex/config.toml` with the wrapper:
+  ```toml
+  model = "gpt-5.1-codex-max"
+  model_reasoning_effort = "high"
+  notify = ["/path/to/Codex-Slack-Notifier/scripts/notifier/codex_notify_wrapper.sh"]
+  ```
+  (See `docs/examples/codex/config.toml`. Optional: set `DEBUG_CODEX_PAYLOAD` or `ENV_FILE`.)
+
 ## Tips
 - Keep the notify command short and use absolute paths.
 - If the tool supplies a payload file path as `$1`, the wrapper will read it; if not, it reads stdin or inline JSON.
