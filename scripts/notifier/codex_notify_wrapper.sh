@@ -34,7 +34,10 @@ ENV_FILE="${ENV_FILE:-"$REPO_ROOT/.env"}"
 # If DEBUG_CODEX_PAYLOAD is set to a filepath, the selected payload will be written there.
 filter_and_forward() {
   REPO_ROOT="$REPO_ROOT" python3 - "$src" <<'PY'
-import json, sys, pathlib, os
+import json
+import sys
+import pathlib
+import os
 
 source = sys.argv[1]
 debug_path = os.environ.get("DEBUG_CODEX_PAYLOAD")
