@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-cleanup_tmp() { [[ -n "${TMP_PAYLOAD:-}" && -f "$TMP_PAYLOAD" ]] && rm -f "$TMP_PAYLOAD"; }
+cleanup_tmp() { [[ "${TMP_PAYLOAD_CREATED:-0}" == "1" && -n "${TMP_PAYLOAD:-}" && -f "$TMP_PAYLOAD" ]] && rm -f "$TMP_PAYLOAD"; }
 trap cleanup_tmp EXIT
 
 # Accept payload via file path, inline JSON argument, or stdin.
@@ -10,6 +10,7 @@ if [[ -n "${1:-}" && "${1}" != "/dev/stdin" && "${1}" != "-" ]]; then
   # If the argument looks like inline JSON, materialize it to a temp file.
   if [[ "$candidate" =~ ^[\{\[] ]]; then
     TMP_PAYLOAD="$(mktemp)"
+    TMP_PAYLOAD_CREATED="1"
     printf "%s\n" "$candidate" > "$TMP_PAYLOAD"
     src="$TMP_PAYLOAD"
   else
