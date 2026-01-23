@@ -67,6 +67,12 @@ def test_build_message_prefers_payload_fields() -> None:
     assert "project" in message
 
 
+def test_build_message_repo_only_adds_default_headline() -> None:
+    message = build_message({"repo": "/path/to/repo"})
+    assert "Codex task completed." in message
+    assert "repo" in message.lower()
+
+
 def test_send_dm_sends_open_then_message(monkeypatch: pytest.MonkeyPatch) -> None:
     responses = [
         FakeResponse(json_data={"ok": True, "channel": {"id": "C123"}}),

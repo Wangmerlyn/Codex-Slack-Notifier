@@ -142,6 +142,9 @@ def build_message(payload: Dict[str, Any], default_title: Optional[str] = None) 
 
     if not lines:
         return "Codex task completed."
+    if lines == [f"Repo: {repo}"]:
+        # Provide a humane default headline when only repo is present.
+        lines.insert(0, "Codex task completed.")
 
     return "\n".join(lines)
 
