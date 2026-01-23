@@ -56,6 +56,7 @@ def test_build_message_prefers_payload_fields() -> None:
         "duration": "3m 12s",
         "summary": "Notebook finished with no errors",
         "url": "https://example.com/logs/123",
+        "repo": "/home/user/project",
     }
     message = build_message(payload)
     assert "Run notebook" in message
@@ -63,6 +64,7 @@ def test_build_message_prefers_payload_fields() -> None:
     assert "3m 12s" in message
     assert "Notebook finished with no errors" in message
     assert "https://example.com/logs/123" in message
+    assert "project" in message
 
 
 def test_send_dm_sends_open_then_message(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -180,6 +182,7 @@ def test_main_uses_user_id_from_env_file(tmp_path: Path, monkeypatch: pytest.Mon
     env_file.write_text("SLACK_BOT_TOKEN=test-token\nSLACK_USER_ID=U123\n", encoding="utf-8")
     monkeypatch.delenv("SLACK_BOT_TOKEN", raising=False)
     monkeypatch.delenv("SLACK_USER_ID", raising=False)
+    monkeypatch.setenv("REPO_ROOT", "/tmp/repo")
 
     sent: list[tuple[str, str]] = []
 
@@ -188,7 +191,9 @@ def test_main_uses_user_id_from_env_file(tmp_path: Path, monkeypatch: pytest.Mon
 
     monkeypatch.setattr(notifier.SlackNotifier, "send_dm", fake_send_dm)
 
-    exit_code = notifier.main(["--env-file", str(env_file), "--payload", '{"status":"ok"}'])
+    exit_code = notifier.main(
+        ["--env-file", str(env_file), "--payload", '{"status":"ok","repo":"/tmp/repo"}']
+    )
 
     assert exit_code == 0
     assert sent and sent[0][0] == "U123"

@@ -124,6 +124,7 @@ def build_message(payload: Dict[str, Any], default_title: Optional[str] = None) 
     summary = payload.get("summary") or payload.get("message") or payload.get("details")
     duration = payload.get("duration") or payload.get("elapsed") or payload.get("time")
     url = payload.get("url") or payload.get("link") or payload.get("target")
+    repo = payload.get("repo") or payload.get("cwd") or payload.get("workspace")
 
     lines = []
     if title:
@@ -136,6 +137,8 @@ def build_message(payload: Dict[str, Any], default_title: Optional[str] = None) 
         lines.append(str(summary))
     if url:
         lines.append(f"Details: {url}")
+    if repo:
+        lines.append(f"Repo: {repo}")
 
     if not lines:
         return "Codex task completed."

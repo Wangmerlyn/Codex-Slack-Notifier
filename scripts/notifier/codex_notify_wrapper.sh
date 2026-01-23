@@ -33,11 +33,12 @@ ENV_FILE="${ENV_FILE:-"$REPO_ROOT/.env"}"
 
 # If DEBUG_CODEX_PAYLOAD is set to a filepath, the selected payload will be written there.
 filter_and_forward() {
-  python3 - "$src" <<'PY'
+  REPO_ROOT="$REPO_ROOT" python3 - "$src" <<'PY'
 import json, sys, pathlib, os
 
 source = sys.argv[1]
 debug_path = os.environ.get("DEBUG_CODEX_PAYLOAD")
+repo_root = os.environ.get("REPO_ROOT")
 
 def read_lines():
     if source != "/dev/stdin" and pathlib.Path(source).exists():
@@ -64,6 +65,8 @@ for line in read_lines():
         last_relevant = obj
 
 chosen = last_relevant or last_valid or {}
+if repo_root and isinstance(chosen, dict):
+    chosen.setdefault("repo", repo_root)
 out = json.dumps(chosen)
 if debug_path:
     try:
