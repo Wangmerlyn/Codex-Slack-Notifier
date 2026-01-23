@@ -1,18 +1,28 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Accept payload either via a file path argument ($1) or stdin.
+cleanup_tmp() { [[ -n "${TMP_PAYLOAD:-}" && -f "$TMP_PAYLOAD" ]] && rm -f "$TMP_PAYLOAD"; }
+trap cleanup_tmp EXIT
+
+# Accept payload via file path, inline JSON argument, or stdin.
 if [[ -n "${1:-}" && "${1}" != "/dev/stdin" && "${1}" != "-" ]]; then
   candidate="${1}"
-  if [[ ! -r "${candidate}" ]]; then
-    # brief retry in case the file is being written
-    sleep 0.2
-  fi
-  if [[ -r "${candidate}" ]]; then
-    src="${candidate}"
+  # If the argument looks like inline JSON, materialize it to a temp file.
+  if [[ "$candidate" =~ ^[\{\[] ]]; then
+    TMP_PAYLOAD="$(mktemp)"
+    printf "%s\n" "$candidate" > "$TMP_PAYLOAD"
+    src="$TMP_PAYLOAD"
   else
-    echo "Payload file '${candidate}' not found or not readable, falling back to stdin" >&2
-    src="/dev/stdin"
+    if [[ ! -r "${candidate}" ]]; then
+      # brief retry in case the file is being written
+      sleep 0.2
+    fi
+    if [[ -r "${candidate}" ]]; then
+      src="${candidate}"
+    else
+      echo "Payload file '${candidate}' not found or not readable, falling back to stdin" >&2
+      src="/dev/stdin"
+    fi
   fi
 else
   src="/dev/stdin"
