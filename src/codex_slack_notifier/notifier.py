@@ -124,8 +124,14 @@ def build_message(payload: Dict[str, Any], default_title: Optional[str] = None) 
     summary = payload.get("summary") or payload.get("message") or payload.get("details")
     duration = payload.get("duration") or payload.get("elapsed") or payload.get("time")
     url = payload.get("url") or payload.get("link") or payload.get("target")
+    repo = payload.get("repo") or payload.get("cwd") or payload.get("workspace")
 
     lines = []
+
+    # If we only have repo, return a single-line, humane message.
+    if repo and not any([title, status, duration, summary, url]):
+        return f"Codex task completed at repo {repo}"
+
     if title:
         lines.append(str(title))
     if status:
@@ -136,6 +142,8 @@ def build_message(payload: Dict[str, Any], default_title: Optional[str] = None) 
         lines.append(str(summary))
     if url:
         lines.append(f"Details: {url}")
+    if repo:
+        lines.append(f"Repo: {repo}")
 
     if not lines:
         return "Codex task completed."
@@ -194,6 +202,12 @@ def _parse_args(argv: Optional[list[str]] = None) -> argparse.Namespace:
         "--title",
         help="Override title for the Slack message",
     )
+    parser.add_argument(
+        "--log-level",
+        choices=["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"],
+        default="WARNING",
+        help="Logging level (default: WARNING). INFO is noisy for Codex notify.",
+    )
     return parser.parse_args(argv)
 
 
@@ -218,8 +232,9 @@ def _load_env_file(env_file: str) -> None:
 
 
 def main(argv: Optional[list[str]] = None) -> int:
-    logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
     args = _parse_args(argv)
+    level = getattr(logging, args.log_level.upper(), logging.WARNING)
+    logging.basicConfig(level=level, format="%(levelname)s %(message)s")
 
     env_file_to_load = args.env_file
     if not env_file_to_load and Path(".env").exists():
