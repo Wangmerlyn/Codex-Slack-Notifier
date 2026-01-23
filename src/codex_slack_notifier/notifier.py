@@ -194,6 +194,12 @@ def _parse_args(argv: Optional[list[str]] = None) -> argparse.Namespace:
         "--title",
         help="Override title for the Slack message",
     )
+    parser.add_argument(
+        "--log-level",
+        choices=["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"],
+        default="WARNING",
+        help="Logging level (default: WARNING). INFO is noisy for Codex notify.",
+    )
     return parser.parse_args(argv)
 
 
@@ -218,8 +224,9 @@ def _load_env_file(env_file: str) -> None:
 
 
 def main(argv: Optional[list[str]] = None) -> int:
-    logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
     args = _parse_args(argv)
+    level = getattr(logging, args.log_level.upper(), logging.WARNING)
+    logging.basicConfig(level=level, format="%(levelname)s %(message)s")
 
     env_file_to_load = args.env_file
     if not env_file_to_load and Path(".env").exists():
