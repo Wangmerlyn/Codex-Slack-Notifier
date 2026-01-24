@@ -43,6 +43,7 @@ import os
 source = sys.argv[1]
 debug_path = os.environ.get("DEBUG_CODEX_PAYLOAD")
 repo_root = os.environ.get("REPO_ROOT")
+pwd_env = os.environ.get("PWD")
 
 def read_lines():
     if source != "/dev/stdin" and pathlib.Path(source).exists():
@@ -69,8 +70,11 @@ for line in read_lines():
         last_relevant = obj
 
 chosen = last_relevant or last_valid or {}
-if repo_root and isinstance(chosen, dict):
-    chosen.setdefault("repo", repo_root)
+if isinstance(chosen, dict):
+    if not any(chosen.get(k) for k in ("repo", "cwd", "workspace")):
+        fallback_repo = pwd_env or repo_root
+        if fallback_repo:
+            chosen["repo"] = fallback_repo
 out = json.dumps(chosen)
 if debug_path:
     try:
