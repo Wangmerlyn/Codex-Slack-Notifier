@@ -74,7 +74,7 @@ for line in read_lines():
 chosen = last_relevant or last_valid or {}
 if isinstance(chosen, dict):
     if not any(chosen.get(k) for k in ("repo", "cwd", "workspace")):
-        fallback_repo = pwd_env or repo_root
+        fallback_repo = pwd_env
         if fallback_repo:
             chosen["repo"] = fallback_repo
 out = json.dumps(chosen)
