@@ -48,6 +48,8 @@ pwd_env = os.environ.get("PWD")
 def read_lines():
     if source != "/dev/stdin" and pathlib.Path(source).exists():
         return pathlib.Path(source).read_text(encoding="utf-8", errors="ignore").splitlines()
+    if sys.stdin.isatty():
+        return []
     return sys.stdin.read().splitlines()
 
 def is_relevant(obj: dict) -> bool:
